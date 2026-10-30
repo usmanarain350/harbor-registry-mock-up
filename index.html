@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Harbor Registry — live demo mock-up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,640&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #e7e1d6;
+    --card: #fffcf8;
+    --ink: #1b2420;
+    --muted: #5f675f;
+    --line: #e3dacb;
+    --forest: #17352e;
+    --leaf: #2c6b52;
+    --mint: #e7f3ec;
+    --gold: #f4efe4;
+    --shadow: 0 1px 2px rgba(23, 53, 46, .04), 0 18px 40px rgba(43, 36, 24, .06);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 400px at 10% -10%, rgba(255,255,255,.7), transparent 50%),
+      var(--paper);
+    font-family: "Source Sans 3", "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 16px;
+  }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 22px 20px 40px; }
+  .top {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: flex-end;
+    padding: 4px 6px 16px;
+  }
+  .brand { display: flex; gap: 12px; align-items: center; }
+  .mark {
+    width: 42px; height: 42px; border-radius: 13px;
+    background: var(--forest); color: #f3e6c8;
+    display: grid; place-items: center;
+    font-family: Fraunces, "Iowan Old Style", Palatino, serif;
+    font-size: 22px; font-weight: 560;
+  }
+  .brand h1 {
+    margin: 0;
+    font-family: Fraunces, "Iowan Old Style", Palatino, serif;
+    font-size: 28px; font-weight: 560; letter-spacing: -0.03em;
+  }
+  .brand p { margin: 1px 0 0; color: var(--muted); font-size: 14px; }
+  .live {
+    margin: 0 0 4px;
+    color: var(--forest);
+    background: rgba(255,252,248,.7);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 13px; font-weight: 600;
+  }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 6px 14px; }
+  .presets button, .text-btn {
+    border: 1px solid #ddd4c6;
+    background: var(--card);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 14px; font-weight: 600;
+  }
+  .presets button.on { background: var(--forest); color: #f6f1e6; border-color: var(--forest); }
+  .presets button small { font-weight: 700; opacity: .7; margin-right: 4px; }
+  .stage {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,.8);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    padding: 22px 22px 18px;
+  }
+  .eyebrow {
+    margin: 0;
+    font-size: 12px; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--leaf);
+  }
+  .stage h2 {
+    margin: 4px 0 6px;
+    font-family: Fraunces, "Iowan Old Style", Palatino, serif;
+    font-size: 32px; font-weight: 560; letter-spacing: -0.03em; line-height: 1.15;
+  }
+  .say { margin: 0; max-width: 68ch; color: #3e4a44; font-size: 16.5px; line-height: 1.45; }
+  .path, .model { margin-top: 18px; }
+  .path {
+    display: flex; align-items: center; gap: 0;
+    overflow-x: auto; padding-bottom: 4px;
+  }
+  .join {
+    width: 104px; flex: 0 0 104px;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    color: #6c645a;
+  }
+  .join i {
+    display: block; width: calc(100% - 10px); height: 2px;
+    background: var(--forest); position: relative;
+  }
+  .join i::after {
+    content: "";
+    position: absolute; right: -7px; top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px 0 5px 8px;
+    border-style: solid;
+    border-color: transparent transparent transparent var(--forest);
+  }
+  .join em {
+    font-style: normal;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px; text-align: center; line-height: 1.3;
+  }
+  .stack { display: flex; flex-direction: column; gap: 8px; flex: 0 0 auto; }
+  .entity {
+    width: 250px; text-align: left; flex: 0 0 auto;
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: 13px 14px 12px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.9) inset;
+  }
+  .entity.is-current {
+    border-color: var(--forest);
+    background: #f3faf6;
+    box-shadow: 0 0 0 4px rgba(23, 53, 46, .1);
+  }
+  .kicker {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #6d655c;
+  }
+  .entity strong { display: block; margin-top: 3px; font-size: 17px; letter-spacing: -0.02em; }
+  .meta { display: block; color: var(--muted); font-size: 13.5px; line-height: 1.35; }
+  .keys { margin-top: 6px; font-size: 12px !important; color: #3f4f48 !important; }
+  .entity code, td code, .schema-card code {
+    display: inline-block; margin-top: 8px;
+    background: var(--gold); color: var(--forest);
+    border-radius: 7px; padding: 2px 6px; font-size: 12px;
+  }
+  .who { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
+  .who strong { margin: 0; }
+  .av {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: grid; place-items: center; color: #fff;
+    font-style: normal; font-size: 12px; font-weight: 700; flex: 0 0 auto;
+  }
+  .pill {
+    display: inline-flex; margin-top: 8px;
+    border-radius: 999px; padding: 3px 8px;
+    font-size: 12px; font-weight: 700;
+  }
+  .st-active { background: #e5f2eb; color: #176b42; }
+  .st-waitlist { background: #f8eed9; color: #8a5712; }
+  .st-completed { background: #e6eef8; color: #29456f; }
+  .meter {
+    display: block; height: 6px; margin-top: 10px;
+    background: #efe8dc; border-radius: 99px; overflow: hidden;
+  }
+  .meter i { display: block; height: 100%; background: var(--leaf); border-radius: 99px; }
+  .loop {
+    margin: 14px 0 0; padding: 10px 12px;
+    background: #f7f3ea; border-radius: 12px;
+    color: #3d4a44; font-size: 14.5px;
+  }
+  .loop code { margin: 0 2px; padding: 1px 5px; }
+  .model {
+    display: grid;
+    grid-template-columns: 1fr 88px 1fr 88px 1fr 88px 1fr;
+    gap: 6px; align-items: stretch;
+  }
+  .schema-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 14px;
+  }
+  .schema-card h3 {
+    margin: 4px 0 0;
+    font-family: Fraunces, Palatino, serif;
+    font-size: 22px; font-weight: 560;
+  }
+  .schema-card ul { list-style: none; margin: 10px 0 0; padding: 0; }
+  .schema-card li {
+    display: flex; justify-content: space-between; gap: 8px;
+    padding: 6px 0; border-top: 1px solid #f0e9de; font-size: 13.5px;
+  }
+  .schema-card li span { color: var(--muted); }
+  .model .join { width: auto; flex: auto; justify-content: center; }
+  .branch { margin-top: 18px; display: grid; grid-template-columns: 250px 1fr 1fr; gap: 16px; align-items: start; }
+  .col-label {
+    margin: 0 0 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #6d655c;
+  }
+  .enroll-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px;
+  }
+  .enroll-row .entity, .branch .entity { width: auto; }
+  .tables {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;
+  }
+  .panel {
+    background: var(--card); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow);
+  }
+  .panel header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px; border-bottom: 1px solid #efe7db;
+  }
+  .panel h3 { margin: 0; font-size: 16px; }
+  .panel header p { margin: 2px 0 0; color: var(--muted); font-size: 12px; font-family: ui-monospace, Menlo, monospace; }
+  .count { text-align: right; }
+  .count b { display: block; font-size: 20px; letter-spacing: -0.03em; }
+  .count span { color: var(--leaf); font-size: 12px; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    color: #7a736a; padding: 8px 12px; font-weight: 700;
+  }
+  td { padding: 9px 12px; border-top: 1px solid #f1ebe2; vertical-align: middle; font-size: 14.5px; }
+  tr { cursor: pointer; }
+  tr:hover td { background: #fbf7f1; }
+  tr.is-hit td { background: var(--mint); }
+  tr.is-hit td:first-child { box-shadow: inset 3px 0 0 var(--forest); }
+  tr.is-dim { opacity: .42; }
+  td code { margin-top: 2px; }
+  td code.hot { background: #d5eee2; }
+  .person-cell, .name-cell { display: flex; gap: 8px; align-items: center; }
+  .person-cell .av { width: 28px; height: 28px; font-size: 11px; }
+  .sub { display: block; color: var(--muted); font-size: 12px; }
+  footer {
+    margin-top: 16px; color: #6e675e; font-size: 13px; padding: 0 6px;
+  }
+  @media (max-width: 980px) {
+    .model, .branch, .tables, .enroll-row { grid-template-columns: 1fr; }
+    .model .join { transform: rotate(90deg); height: 48px; }
+    .top { flex-direction: column; align-items: flex-start; }
+    .stage h2 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">H</div>
+      <div>
+        <h1>Harbor Registry</h1>
+        <p>Sample mock-up for a 10–15 minute live demo. Not a real organization’s data.</p>
+      </div>
+    </div>
+    <p class="live">Four tables · preset examples · click any row</p>
+  </header>
+  <nav class="presets" aria-label="Preset examples">
+    <button type="button" data-preset="amira"><small>01</small> One client, two programs</button>
+    <button type="button" data-preset="shelter"><small>02</small> Whole shelter</button>
+    <button type="button" data-preset="waitlist"><small>03</small> Waitlist</button>
+    <button type="button" data-preset="done"><small>04</small> Completed</button>
+    <button type="button" data-preset="model"><small>05</small> Show the model</button>
+  </nav>
+  <section class="stage" id="stage"></section>
+  <section class="tables" id="tables"></section>
+  <footer>Invented records for the demonstration. Organizations, people, programs, and enrollments stay in separate tables and meet through ids.</footer>
+</div>
+<script>
+const db = {
+  organizations: [
+    { id: "ORG-104", name: "Harbor Light Shelter", city: "Chicago", focus: "Housing" },
+    { id: "ORG-118", name: "Northside Food Bank", city: "Chicago", focus: "Food" },
+    { id: "ORG-131", name: "Youth Arts Collective", city: "Evanston", focus: "Youth" }
+  ],
+  people: [
+    { id: "PER-2201", name: "Amira Khan", role: "Client", organization_id: "ORG-104" },
+    { id: "PER-2208", name: "Luis Ortega", role: "Coordinator", organization_id: "ORG-118" },
+    { id: "PER-2214", name: "Priya Shah", role: "Participant", organization_id: "ORG-131" },
+    { id: "PER-2230", name: "Jonah Ellis", role: "Client", organization_id: "ORG-104" },
+    { id: "PER-2233", name: "Maya Brooks", role: "Case worker", organization_id: "ORG-104" },
+    { id: "PER-2240", name: "Samir Haddad", role: "Volunteer", organization_id: "ORG-118" }
+  ],
+  programs: [
+    { id: "PRG-11", name: "Emergency beds", organization_id: "ORG-104", seats: 24 },
+    { id: "PRG-12", name: "Case management", organization_id: "ORG-104", seats: 40 },
+    { id: "PRG-21", name: "Weekly groceries", organization_id: "ORG-118", seats: 120 },
+    { id: "PRG-30", name: "After-school studio", organization_id: "ORG-131", seats: 18 }
+  ],
+  enrollments: [
+    { id: "ENR-501", person_id: "PER-2201", program_id: "PRG-11", status: "Active", started: "2026-09-02" },
+    { id: "ENR-502", person_id: "PER-2201", program_id: "PRG-12", status: "Active", started: "2026-09-02" },
+    { id: "ENR-518", person_id: "PER-2230", program_id: "PRG-11", status: "Waitlist", started: "2026-10-11" },
+    { id: "ENR-520", person_id: "PER-2233", program_id: "PRG-12", status: "Active", started: "2026-01-15" },
+    { id: "ENR-533", person_id: "PER-2208", program_id: "PRG-21", status: "Active", started: "2025-11-03" },
+    { id: "ENR-540", person_id: "PER-2240", program_id: "PRG-21", status: "Completed", started: "2026-06-01" },
+    { id: "ENR-547", person_id: "PER-2214", program_id: "PRG-30", status: "Active", started: "2026-08-20" }
+  ]
+};
+
+const presets = {
+  amira: { table: "people", id: "PER-2201" },
+  shelter: { table: "organizations", id: "ORG-104" },
+  waitlist: { table: "enrollments", id: "ENR-518" },
+  done: { table: "enrollments", id: "ENR-540" }
+};
+
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const tones = ["#17352e", "#3d5c49", "#6d5228", "#314861", "#6a3e3e", "#2c5552"];
+
+let selected = { ...presets.amira };
+let preset = "amira";
+
+function byId(table, id) { return db[table].find(row => row.id === id); }
+function prettyDate(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${d} ${months[m - 1]} ${y}`;
+}
+function initials(name) { return name.split(" ").map(part => part[0]).slice(0, 2).join(""); }
+function tone(name) {
+  let n = 0;
+  for (const ch of name) n += ch.charCodeAt(0);
+  return tones[n % tones.length];
+}
+function load(programId) {
+  const rows = db.enrollments.filter(row => row.program_id === programId);
+  const count = status => rows.filter(row => row.status === status).length;
+  return { active: count("Active"), waitlist: count("Waitlist"), completed: count("Completed") };
+}
+function pill(status) {
+  return `<span class="pill st-${status.toLowerCase()}">${status}</span>`;
+}
+function related(sel) {
+  if (!sel) return null;
+  const ids = { organizations: new Set(), people: new Set(), programs: new Set(), enrollments: new Set() };
+  const addEnrollment = enr => {
+    ids.enrollments.add(enr.id);
+    ids.people.add(enr.person_id);
+    ids.programs.add(enr.program_id);
+    ids.organizations.add(byId("people", enr.person_id).organization_id);
+    ids.organizations.add(byId("programs", enr.program_id).organization_id);
+  };
+  if (sel.table === "people") {
+    ids.people.add(sel.id);
+    ids.organizations.add(byId("people", sel.id).organization_id);
+    db.enrollments.filter(row => row.person_id === sel.id).forEach(addEnrollment);
+  } else if (sel.table === "organizations") {
+    ids.organizations.add(sel.id);
+    db.people.filter(row => row.organization_id === sel.id).forEach(row => ids.people.add(row.id));
+    db.programs.filter(row => row.organization_id === sel.id).forEach(row => ids.programs.add(row.id));
+    db.enrollments.forEach(row => {
+      if (ids.people.has(row.person_id) || ids.programs.has(row.program_id)) addEnrollment(row);
+    });
+  } else if (sel.table === "programs") {
+    ids.programs.add(sel.id);
+    ids.organizations.add(byId("programs", sel.id).organization_id);
+    db.enrollments.filter(row => row.program_id === sel.id).forEach(addEnrollment);
+  } else {
+    addEnrollment(byId("enrollments", sel.id));
+  }
+  return ids;
+}
+
+function join(label) {
+  return `<div class="join" aria-hidden="true"><i></i><em>${label}</em></div>`;
+}
+function orgCard(org) {
+  const current = selected && selected.table === "organizations" && selected.id === org.id;
+  return `<button type="button" class="entity ${current ? "is-current" : ""}" data-table="organizations" data-id="${org.id}">
+    <span class="kicker">Organization</span>
+    <strong>${org.name}</strong>
+    <span class="meta">${org.focus} · ${org.city}</span>
+    <code>${org.id}</code>
+  </button>`;
+}
+function personCard(person, status) {
+  const current = selected && selected.table === "people" && selected.id === person.id;
+  return `<button type="button" class="entity ${current ? "is-current" : ""}" data-table="people" data-id="${person.id}">
+    <span class="kicker">Person</span>
+    <span class="who"><i class="av" style="background:${tone(person.name)}">${initials(person.name)}</i><span><strong>${person.name}</strong><span class="meta">${person.role}</span></span></span>
+    ${status ? pill(status) : ""}
+    <code>${person.id}</code>
+  </button>`;
+}
+function programCard(program) {
+  const current = selected && selected.table === "programs" && selected.id === program.id;
+  const used = load(program.id);
+  const pct = Math.max(6, Math.round((used.active / program.seats) * 100));
+  const bits = [`${used.active} active`];
+  if (used.waitlist) bits.push(`${used.waitlist} waitlist`);
+  if (used.completed) bits.push(`${used.completed} completed`);
+  return `<button type="button" class="entity ${current ? "is-current" : ""}" data-table="programs" data-id="${program.id}">
+    <span class="kicker">Program</span>
+    <strong>${program.name}</strong>
+    <span class="meter" aria-hidden="true"><i style="width:${pct}%"></i></span>
+    <span class="meta">${bits.join(" · ")} · ${program.seats} seats</span>
+    <code>${program.id}</code>
+  </button>`;
+}
+function enrollmentCard(enr) {
+  const current = selected && selected.table === "enrollments" && selected.id === enr.id;
+  const person = byId("people", enr.person_id);
+  const program = byId("programs", enr.program_id);
+  return `<button type="button" class="entity ${current ? "is-current" : ""}" data-table="enrollments" data-id="${enr.id}">
+    <span class="kicker">Enrollment</span>
+    <strong>${person.name}</strong>
+    <span class="meta">${program.name}</span>
+    ${pill(enr.status)}
+    <span class="meta">since ${prettyDate(enr.started)}</span>
+    <code>${enr.id}</code>
+    <span class="meta keys">person_id ${enr.person_id}<br>program_id ${enr.program_id}</span>
+  </button>`;
+}
+
+function story() {
+  if (!selected) {
+    return {
+      eyebrow: "The model",
+      title: "Four tables, joined by ids.",
+      say: "People belong to an organization. Programs belong to an organization. An enrollment stores the person and the program, plus a status. Click a preset or any row.",
+      body: modelBody()
+    };
+  }
+  const row = byId(selected.table, selected.id);
+  if (selected.table === "people") {
+    const org = byId("organizations", row.organization_id);
+    const enrs = db.enrollments.filter(item => item.person_id === row.id);
+    const names = enrs.map(item => byId("programs", item.program_id).name).join(" and ");
+    const countWord = ["no", "one", "two", "three", "four"][enrs.length] || String(enrs.length);
+    return {
+      eyebrow: "Preset path",
+      title: `${row.name} is in ${countWord} ${enrs.length === 1 ? "program" : "programs"}.`,
+      say: `The person id ${row.id} is stored on ${enrs.length === 1 ? "one enrollment" : "each enrollment"}: ${names}. ${org.name} is linked with organization_id. The name is not copied onto the enrollment.`,
+      body: `<div class="path">${orgCard(org)}${join("organization_id")}${personCard(row)}${join("person_id")}<div class="stack">${enrs.map(enrollmentCard).join("")}</div></div>`
+    };
+  }
+  if (selected.table === "organizations") {
+    const people = db.people.filter(item => item.organization_id === row.id);
+    const programs = db.programs.filter(item => item.organization_id === row.id);
+    const enrs = db.enrollments.filter(item => programs.some(program => program.id === item.program_id) || people.some(person => person.id === item.person_id));
+    return {
+      eyebrow: "Organization",
+      title: `${row.name} · ${people.length} people, ${programs.length} programs.`,
+      say: "Clients and staff share the people table. Role is a field, not another table. Only an enrollment connects a person to a program.",
+      body: `<div class="branch">
+        <div>${orgCard(row)}</div>
+        <div><p class="col-label">people.organization_id</p><div class="stack">${people.map(person => personCard(person)).join("")}</div></div>
+        <div><p class="col-label">programs.organization_id</p><div class="stack">${programs.map(programCard).join("")}</div></div>
+      </div>
+      <p class="col-label" style="margin-top:16px">enrollments · person_id + program_id</p>
+      <div class="enroll-row">${enrs.map(enrollmentCard).join("")}</div>`
+    };
+  }
+  if (selected.table === "programs") {
+    const org = byId("organizations", row.organization_id);
+    const enrs = db.enrollments.filter(item => item.program_id === row.id);
+    return {
+      eyebrow: "Program",
+      title: `${row.name} is run by ${org.name}.`,
+      say: `${row.seats} seats live on the program. Who is in it, and whether they are active, waiting, or finished, lives on the enrollment.`,
+      body: `<div class="path">${programCard(row)}${join("organization_id")}${orgCard(org)}${join("program_id")}<div class="stack">${enrs.map(item => personCard(byId("people", item.person_id), item.status)).join("")}</div></div>`
+    };
+  }
+  const person = byId("people", row.person_id);
+  const program = byId("programs", row.program_id);
+  const org = byId("organizations", program.organization_id);
+  return {
+    eyebrow: row.status,
+    title: `${person.name} · ${program.name}.`,
+    say: row.status === "Waitlist"
+      ? `${person.name} is already a client at ${org.name}. The bed is not active yet. Only the enrollment status changes. The person record stays.`
+      : `${person.name} finished ${program.name}. The person and the program stay in their own tables. Completed is a status on the enrollment.`,
+    body: `<div class="path">${personCard(person)}${join("person_id")}${enrollmentCard(row)}${join("program_id")}${programCard(program)}</div>
+      <p class="loop">The organization is not stored again here. This enrollment reaches <strong>${org.name}</strong> through the program’s <code>organization_id</code> (${org.id}).</p>`
+  };
+}
+
+function modelBody() {
+  const card = (name, fields) => `<article class="schema-card"><span class="kicker">Table</span><h3>${name}</h3><ul>${fields.map(([key, note]) => `<li><code>${key}</code><span>${note}</span></li>`).join("")}</ul></article>`;
+  return `<div class="model">
+    ${card("organizations", [["id", "key"], ["name", ""], ["city", ""], ["focus", ""]])}
+    ${join("organization_id")}
+    ${card("people", [["id", "key"], ["name", ""], ["role", "client or staff"], ["organization_id", "→ org"]])}
+    ${join("person_id")}
+    ${card("enrollments", [["id", "key"], ["person_id", "→ person"], ["program_id", "→ program"], ["status", "active, waitlist, completed"]])}
+    ${join("program_id")}
+    ${card("programs", [["id", "key"], ["name", ""], ["seats", ""], ["organization_id", "→ org"]])}
+  </div>
+  <p class="loop">A program also points at its organization with <code>programs.organization_id</code>. An enrollment does not copy the organization. It gets there through the person or the program.</p>`;
+}
+
+function renderStage() {
+  const item = story();
+  document.getElementById("stage").innerHTML = `<p class="eyebrow">${item.eyebrow}</p><h2>${item.title}</h2><p class="say">${item.say}</p>${item.body}`;
+  document.querySelectorAll("[data-preset]").forEach(button => button.classList.toggle("on", button.dataset.preset === preset));
+}
+
+function hot(id, ids, table) {
+  return ids && ids[table].has(id) ? "hot" : "";
+}
+function rowClass(table, id, ids) {
+  if (!ids) return "";
+  return ids[table].has(id) ? "is-hit" : "is-dim";
+}
+function panel(table, title, hint, head, rows) {
+  const ids = related(selected);
+  const linked = ids ? `${ids[table].size} linked` : "click a row";
+  return `<article class="panel"><header><div><h3>${title}</h3><p>${hint}</p></div><div class="count"><b>${db[table].length}</b><span>${linked}</span></div></header>
+    <table><thead><tr>${head.map(label => `<th>${label}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></article>`;
+}
+function renderTables() {
+  const ids = related(selected);
+  const organizations = db.organizations.map(row => `<tr class="${rowClass("organizations", row.id, ids)}" data-table="organizations" data-id="${row.id}"><td><strong>${row.name}</strong><span class="sub">${row.focus}</span></td><td>${row.city}</td><td><code class="${hot(row.id, ids, "organizations")}">${row.id}</code></td></tr>`).join("");
+  const people = db.people.map(row => {
+    const org = byId("organizations", row.organization_id);
+    return `<tr class="${rowClass("people", row.id, ids)}" data-table="people" data-id="${row.id}"><td><span class="person-cell"><i class="av" style="background:${tone(row.name)}">${initials(row.name)}</i><span><strong>${row.name}</strong><code class="${hot(row.id, ids, "people")}">${row.id}</code></span></span></td><td>${row.role}</td><td>${org.name}<code class="${hot(org.id, ids, "organizations")}">${row.organization_id}</code></td></tr>`;
+  }).join("");
+  const programs = db.programs.map(row => {
+    const org = byId("organizations", row.organization_id);
+    const used = load(row.id);
+    const bits = [`${used.active} active`];
+    if (used.waitlist) bits.push(`${used.waitlist} waitlist`);
+    if (used.completed) bits.push(`${used.completed} completed`);
+    return `<tr class="${rowClass("programs", row.id, ids)}" data-table="programs" data-id="${row.id}"><td><strong>${row.name}</strong><code class="${hot(row.id, ids, "programs")}">${row.id}</code></td><td>${org.name}<code class="${hot(org.id, ids, "organizations")}">${row.organization_id}</code></td><td>${bits.join(" · ")} · ${row.seats} seats</td></tr>`;
+  }).join("");
+  const enrollments = db.enrollments.map(row => {
+    const person = byId("people", row.person_id);
+    const program = byId("programs", row.program_id);
+    return `<tr class="${rowClass("enrollments", row.id, ids)}" data-table="enrollments" data-id="${row.id}"><td><strong>${person.name}</strong><code class="${hot(person.id, ids, "people")}">${row.person_id}</code></td><td>${program.name}<code class="${hot(program.id, ids, "programs")}">${row.program_id}</code></td><td>${pill(row.status)}<span class="sub">${prettyDate(row.started)} · ${row.id}</span></td></tr>`;
+  }).join("");
+  document.getElementById("tables").innerHTML = [
+    panel("organizations", "Organizations", "organizations", ["Name", "City", "Id"], organizations),
+    panel("people", "People", "people", ["Name", "Role", "Organization"], people),
+    panel("programs", "Programs", "programs", ["Program", "Run by", "Capacity"], programs),
+    panel("enrollments", "Enrollments", "enrollments", ["Person", "Program", "Status"], enrollments)
+  ].join("");
+}
+function render() { renderStage(); renderTables(); }
+
+document.body.addEventListener("click", event => {
+  const presetButton = event.target.closest("[data-preset]");
+  if (presetButton) {
+    preset = presetButton.dataset.preset;
+    selected = preset === "model" ? null : { ...presets[preset] };
+    render();
+    return;
+  }
+  const hit = event.target.closest("[data-table]");
+  if (!hit) return;
+  preset = "";
+  selected = { table: hit.dataset.table, id: hit.dataset.id };
+  render();
+});
+
+const fromUrl = new URLSearchParams(location.search).get("preset");
+if (fromUrl === "model") {
+  preset = "model";
+  selected = null;
+} else if (presets[fromUrl]) {
+  preset = fromUrl;
+  selected = { ...presets[fromUrl] };
+}
+render();
+</script>
+</body>
+</html>
